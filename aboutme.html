@@ -27,8 +27,6 @@
     <link rel="dns-prefetch" href="https://cdn1.lncld.net">
 
 
-    <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
-
 
 
     <link rel="dns-prefetch" href="https://cdn1.lncld.net">
@@ -379,18 +377,17 @@
 </button>
 <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-fuctions-share-button">
     
+    <!-- Leancloud Views -->
+        <a class="post_share-link" href="#">
+            <li class="mdl-menu__item">
+                <span id="/aboutme.html" class="leancloud-views_num" data-flag-title="关于我">
+     &nbsp;浏览量
+</span>
 
+            </li>
+        </a>
     
-        
-            <!-- Busuanzi Views -->
-            <a class="post_share-link" href="#">
-                <li class="mdl-menu__item">
-                    <span id="busuanzi_container_page_pv">
-                        <span id="busuanzi_value_page_pv"></span>&nbsp;浏览量
-                    </span>
-                </li>
-            </a>
-        
+
     
 
     <!-- Share Weibo -->
@@ -487,7 +484,7 @@
 </ul>
 <hr>
 <h1 id="音乐"><a href="#音乐" class="headerlink" title="音乐"></a>音乐</h1><p>喜欢听的歌单在这儿哦，如果喜欢可以去网易云关注我。<br>
-    <div id="aplayer-exgDzfQh" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="38740250" data-server="netease" data-type="playlist" data-mode="circulation" data-autoplay="true" data-mutex="false" data-listmaxheight="340px" data-preload="none" data-theme="#ad7a86"></div></p>
+    <div id="aplayer-nDQFJdkb" class="aplayer aplayer-tag-marker meting-tag-marker" data-id="38740250" data-server="netease" data-type="playlist" data-mode="circulation" data-autoplay="true" data-mutex="false" data-listmaxheight="340px" data-preload="none" data-theme="#ad7a86"></div></p>
 <h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>博客纯粹是个人兴趣，可能更，可能一直不会更，不确定。但是还是无耻希望路过的朋友们可以留下你的评论。各位博主，有兴趣的可以一起加个友链。因为！！！<br><img src="http://img02.sogoucdn.com/app/a/100520146/5fc60901d79e364878ed75d4c54278dd" alt="岂不美哉"></p>
 <h1 id="再见-зゝ∠"><a href="#再见-зゝ∠" class="headerlink" title="再见 _(:зゝ∠)_"></a>再见 _(:зゝ∠)_</h1>
         
@@ -897,10 +894,92 @@ It will not impact the appearance and can give developers a lot of support :)
 
 
 
+    <!-- Leancloud -->
+    <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+    <script>
+        AV.initialize('zIjj4dYT9l0p0Wq2GRKN19SI-gzGzoHsz', 'BOhcJzc1T3PuV2Xu9rprQ2u9');
+    </script>
+    <script type="text/ls-javascript" id="leancloud-views-script">
+    function showTime(Counter) {
+        var query = new AV.Query(Counter);
+        $('.leancloud-views_num').each(function() {
+            var url = $(this).attr('id').trim();
+            query.equalTo('url', url);
+            query.find({
+                success: function(results) {
+                    if (results.length === 0) {
+                        var content = '0 ' + $(document.getElementById(url)).text();
+                        $(document.getElementById(url)).text(content);
+                        return;
+                    }
+                    for (var i = 0; i < results.length; i++) {
+                        var object = results[i];
+                        var content = object.get('time') + ' ' + $(document.getElementById(url)).text();
+                        $(document.getElementById(url)).text(content);
+                    }
+                },
+                error: function(object, error) {
+                    console.log('Error: ' + error.code + ' ' + error.message);
+                }
+            });
+        });
+    }
+
+    function addCount(Counter) {
+      var Counter = AV.Object.extend('Counter');
+      url = $('.leancloud-views_num').attr('id').trim();
+      title = $('.leancloud-views_num').attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+      query.equalTo('url', url);
+      query.find({
+          success: function(results) {
+            if (results.length > 0) {
+                var counter = results[0];
+                counter.fetchWhenSave(true);
+                counter.increment('time');
+                counter.save(null, {
+                    success: function(counter) {
+                        var content =  counter.get('time') + ' ' + $(document.getElementById(url)).text();
+                        $(document.getElementById(url)).text(content);
+                    },
+                    error: function(counter, error) {
+                        console.log('Failed to save Visitor num, with error message: ' + error.message);
+                    }
+                });
+            } else {
+              var newcounter = new Counter();
+              newcounter.set('title', title);
+              newcounter.set('url', url);
+              newcounter.set('time', 1);
+              newcounter.save(null, {
+                  success: function(newcounter) {
+                      console.log('newcounter.get(\'time\')='+newcounter.get('time'));
+                      var content = newcounter.get('time') + ' ' + $(document.getElementById(url)).text();
+                      $(document.getElementById(url)).text(content);
+                  },
+                  error: function(newcounter, error) {
+                      console.log('Failed to create');
+                  }
+              });
+            }
+        },
+        error: function(error) {
+            console.log('Error:' + error.code + ' ' + error.message);
+        }
+      });
+    }
+    $(function() {
+        var Counter = AV.Object.extend('Counter');
+        if ($('.leancloud-views_num').length === 1) {
+            addCount(Counter);
+        } else if ($('.post-title-link').length > 1) {
+            showTime(Counter);
+        }
+    });
+</script>
 
 
-    <!-- Busuanzi -->
-    <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
 
 
 
